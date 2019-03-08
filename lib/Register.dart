@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _RegisterPageState();
+  }
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
   final TextEditingController repass = TextEditingController();
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
-  void _continue(BuildContext context) {
+  void _continue(BuildContext context) async {
     print(email.text);
     print(password.text);
     print(repass.text);
@@ -18,8 +27,14 @@ class RegisterPage extends StatelessWidget {
         content: new Text('กรุณาระบุข้อมูลให้ครบถ้วน'),
       )
     );
-    } else {
+    } else if (password.text == repass.text) {
+      await auth.createUserWithEmailAndPassword(email: email.text, password: password.text);
       Navigator.pop(context);
+    } else {
+      Scaffold.of(context).showSnackBar(new SnackBar(
+        content: new Text('กรุณาใส่ password ให้ตรงกัน'),
+      )
+    );
     }
   }
 

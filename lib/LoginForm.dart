@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import './Register.dart';
 import './Home.dart';
 
 class LoginForm extends StatelessWidget {
   final TextEditingController user = TextEditingController();
   final TextEditingController password = TextEditingController();
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
-  void _login(BuildContext context) {
+  void _login(BuildContext context) async {
     if (user.text == '' || password.text == '') {
       final snackBar = SnackBar(
       content: Text('กรุณาระบุ Username or Password'),
@@ -17,10 +19,18 @@ class LoginForm extends StatelessWidget {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home()));
 
     } else {
-      final snackBar = SnackBar(
-      content: Text('username or password ไม่ถูกต้อง'),
-      );
-      Scaffold.of(context).showSnackBar(snackBar);
+      try {
+        await auth.signInWithEmailAndPassword(email: user.text, password: password.text);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home()));
+      } catch (err) {
+        if (err.toString().contains('badly formatted')){
+          final snackBar = SnackBar(
+            content: Text('อีเมล์ไม่ถูกต้อง'),
+          );
+          Scaffold.of(context).showSnackBar(snackBar);
+
+        }
+      }
     }
   }
 
